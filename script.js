@@ -1,11 +1,10 @@
-// JSONP-based loader
-const GAS_URL = 'https://script.google.com/macros/s/AKfycby8fvmzbfpwWZqsFsoY1YX6c7ZcYIDdGJNTtANRCWrAMd6ZcKIVBF6PRhNsF5_EYWeUmg/exec';
+// JSONP PWA frontend
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzhUcJoJnwmQTBXhO_00ylxCO0pMkY4gNBQJhx-rXN6t7x-4N7hYV9Q1xOQsWNZI0GBuQ/exec';
 
 function loadDiagnoses() {
-  // global callback
-  window.handleDiag = function(list) {
+  window.handleDiag = diagnoses => {
     const sel = document.getElementById('diagnosis');
-    list.forEach(d => sel.add(new Option(d, d)));
+    diagnoses.forEach(d => sel.add(new Option(d, d)));
   };
   const s = document.createElement('script');
   s.src = `${GAS_URL}?action=getDiagnosisList&callback=handleDiag`;
@@ -13,7 +12,7 @@ function loadDiagnoses() {
 }
 
 function calculate() {
-  window.handleCalc = function(results) {
+  window.handleCalc = results => {
     document.getElementById('result').innerHTML = results.join('<br><br>');
   };
 
@@ -26,12 +25,12 @@ function calculate() {
     callback:  'handleCalc'
   };
 
-  const query = Object.entries(params)
+  const qs = Object.entries(params)
     .map(([k,v]) => `${k}=${encodeURIComponent(v)}`)
     .join('&');
 
   const s = document.createElement('script');
-  s.src = `${GAS_URL}?${query}`;
+  s.src = `${GAS_URL}?${qs}`;
   document.body.appendChild(s);
 }
 
