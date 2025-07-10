@@ -1,40 +1,38 @@
-// script.js
+// JSONP-based loader
 const GAS_URL = 'https://script.google.com/macros/s/AKfycby8fvmzbfpwWZqsFsoY1YX6c7ZcYIDdGJNTtANRCWrAMd6ZcKIVBF6PRhNsF5_EYWeUmg/exec';
 
-async function loadDiagnoses() {
-  try {
-    const res = await fetch(`${GAS_URL}?action=getDiagnosisList`);
-    const list = await res.json();
+function loadDiagnoses() {
+  // global callback
+  window.handleDiag = function(list) {
     const sel = document.getElementById('diagnosis');
-    list.forEach(d => {
-      const o = document.createElement('option');
-      o.value = d; o.textContent = d;
-      sel.appendChild(o);
-    });
-  } catch (e) {
-    console.error('Failed to load diagnoses', e);
-  }
+    list.forEach(d => sel.add(new Option(d, d)));
+  };
+  const s = document.createElement('script');
+  s.src = `${GAS_URL}?action=getDiagnosisList&callback=handleDiag`;
+  document.body.appendChild(s);
 }
 
-async function calculate() {
-  const payload = {
-    action: 'calculateAntibiotic',
-    ageUnit: document.getElementById('ageUnit').value,
-    age: parseFloat(document.getElementById('age').value),
-    weight: parseFloat(document.getElementById('weight').value),
-    diagnosis: document.getElementById('diagnosis').value
+function calculate() {
+  window.handleCalc = function(results) {
+    document.getElementById('result').innerHTML = results.join('<br><br>');
   };
-  try {
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const out = await res.json();
-    document.getElementById('result').innerHTML = out.join('<br><br>');
-  } catch (e) {
-    console.error('Calculation error', e);
-  }
+
+  const params = {
+    action:    'calculateAntibiotic',
+    ageUnit:   document.getElementById('ageUnit').value,
+    age:       document.getElementById('age').value,
+    weight:    document.getElementById('weight').value,
+    diagnosis: document.getElementById('diagnosis').value,
+    callback:  'handleCalc'
+  };
+
+  const query = Object.entries(params)
+    .map(([k,v]) => `${k}=${encodeURIComponent(v)}`)
+    .join('&');
+
+  const s = document.createElement('script');
+  s.src = `${GAS_URL}?${query}`;
+  document.body.appendChild(s);
 }
 
 document.getElementById('calcBtn').addEventListener('click', calculate);
