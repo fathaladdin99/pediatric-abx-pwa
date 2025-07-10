@@ -1,24 +1,23 @@
 // service-worker.js
 
-const CACHE_NAME = 'abx-calc-v2';  // bump from v1→v2
+const CACHE_NAME = 'abx-calc-v2';  // bump cache version
 const ASSETS = [
-  '/', 
-  '/index.html',
-  '/style.css',
-  '/script.js',
-  '/manifest.json'
+  'index.html',
+  'style.css',
+  'script.js',
+  'manifest.json'
 ];
 
-self.addEventListener('install', event => {
-  event.waitUntil(
+self.addEventListener('install', e => {
+  e.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(ASSETS))
       .then(() => self.skipWaiting())
   );
 });
 
-self.addEventListener('activate', event => {
-  event.waitUntil(
+self.addEventListener('activate', e => {
+  e.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys
@@ -30,14 +29,12 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
-  // Only cache same-origin assets
-  if (url.origin !== location.origin) return;
+self.addEventListener('fetch', e => {
+  // Only handle requests for our own files
+  if (new URL(e.request.url).origin !== location.origin) return;
 
-  event.respondWith(
-    caches.match(event.request)
-      .then(cached => cached || fetch(event.request))
+  e.respondWith(
+    caches.match(e.request)
+      .then(cached => cached || fetch(e.request))
   );
 });
-
