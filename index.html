@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="theme-color" content="#00796b" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Pediatric Antibiotic Calculator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <img src="https://pbs.twimg.com/media/Enm-TOzXcAc1oDl.jpg"
+         class="logo" alt="Antibiotic">
+    <h1>Pediatric Antibiotic Calculator</h1>
+
+    <label for="ageUnit">Age Unit</label>
+    <select id="ageUnit">
+      <option value="Years">Years</option>
+      <option value="Months">Months</option>
+    </select>
+
+    <label for="age">Age</label>
+    <input type="number" id="age" placeholder="Enter age">
+
+    <label for="weight">Weight (kg)</label>
+    <input type="number" id="weight" placeholder="Enter weight">
+
+    <label for="diagnosis">Diagnosis</label>
+    <select id="diagnosis"></select>
+
+    <button id="calcBtn">Calculate</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>
